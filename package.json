@@ -1,0 +1,69 @@
+{
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "prepublish": "pridepack build",
+    "build": "pridepack build",
+    "type-check": "pridepack check",
+    "lint": "pridepack lint",
+    "test": "pridepack test --passWithNoTests",
+    "clean": "pridepack clean",
+    "watch": "pridepack watch"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pridepack"
+  ],
+  "name": "react-byblos",
+  "module": "dist/react-byblos.esm.js",
+  "exports": {
+    "require": "./dist/index.js",
+    "imports": "./dist/react-byblos.esm.js"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.5",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/react-hooks": "^3.4.2",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.5",
+    "@types/pdfjs-dist": "^2.1.5",
+    "@types/react": "^16.9.53",
+    "eslint": "^7.12.1",
+    "eslint-config-lxsmnsyc": "^0.1.19",
+    "pridepack": "^0.2.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-test-renderer": "^17.0.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.0.5"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "description": "PDF Viewer component for React",
+  "author": "Alexis Munsayac <alexis.munsayac@gmail.com>",
+  "private": false,
+  "repository": {
+    "url": "https://github.com/lxsmnsyc/react-byblos.git",
+    "type": "git"
+  },
+  "homepage": "https://github.com/lxsmnsyc/react-byblos",
+  "bugs": {
+    "url": "https://github.com/lxsmnsyc/react-byblos/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^2.5.207"
+  }
+}
