@@ -33,6 +33,7 @@ import {
 } from 'pdfjs-dist';
 import React, {
   forwardRef,
+  ReactNode,
   useRef,
 } from 'react';
 import pdfPromiseToES6 from './pdf-promise-to-es6';
@@ -45,7 +46,10 @@ export interface ByblosPropsBase {
   scale?: number;
   onLoading?: () => void;
   onSuccess?: () => void;
-  onFailure?: (error: unknown) => void;
+  onFailure?: <E = Error>(error: E) => void;
+  className?: string;
+  loadingFallback?: ReactNode;
+  errorFallback?: ReactNode;
 }
 
 export interface ByblosPropsURL extends ByblosPropsBase {
@@ -119,18 +123,7 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
     if (error && props.onFailure) {
       props.onFailure(error);
     }
-  }, [props.onSuccess, error]);
-
-  // Decorate forwarded ref
-  useIsomorphicEffect(() => {
-    if (canvasRef.current) {
-      if (typeof ref === 'function') {
-        ref(canvasRef.current);
-      } else if (ref != null) {
-        ref.current = canvasRef.current;
-      }
-    }
-  }, [canvasRef.current, ref]);
+  }, [props.onFailure, error]);
 
   // Run rendering process
   useIsomorphicEffect(() => {
@@ -154,11 +147,26 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
         viewport,
       });
     }
-  }, [pageResult, props.scale]);
+  }, [canvasRef.current, pageResult.status, pageResult.data, props.scale]);
+
+  if (loading) {
+    return <>{ props.loadingFallback }</>;
+  }
+  if (error) {
+    return <>{ props.errorFallback }</>;
+  }
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={(instance) => {
+        canvasRef.current = instance;
+        if (typeof ref === 'function') {
+          ref(instance);
+        } else if (ref != null) {
+          ref.current = instance;
+        }
+      }}
+      className={props.className}
     />
   );
 });
