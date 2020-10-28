@@ -50,6 +50,9 @@ export interface ByblosPropsBase {
   className?: string;
   loadingFallback?: ReactNode;
   errorFallback?: ReactNode;
+
+  onDocumentSuccess: (pdf: PDFDocumentProxy) => void;
+  onPageSuccess: (pdf: PDFPageProxy) => void;
 }
 
 export interface ByblosPropsURL extends ByblosPropsBase {
@@ -86,6 +89,12 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
     return suspend();
   }, [bufferResult]);
 
+  useIsomorphicEffect(() => {
+    if (documentResult.status === 'success' && props.onDocumentSuccess) {
+      props.onDocumentSuccess(documentResult.data);
+    }
+  }, [documentResult, props.onDocumentSuccess]);
+
   // Parse PDF Document to Page
   const pageResult = useFetch<PDFPageProxy>(async (wrap) => {
     if (documentResult.status === 'success') {
@@ -93,6 +102,12 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
     }
     return suspend();
   }, [documentResult, props.page]);
+
+  useIsomorphicEffect(() => {
+    if (pageResult.status === 'success' && props.onPageSuccess) {
+      props.onPageSuccess(pageResult.data);
+    }
+  }, [pageResult, props.onPageSuccess]);
 
   // Ref to canvas
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
