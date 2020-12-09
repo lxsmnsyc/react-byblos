@@ -51,8 +51,8 @@ export interface ByblosPropsBase {
   loadingFallback?: ReactNode;
   errorFallback?: ReactNode;
 
-  onDocumentSuccess: (pdf: PDFDocumentProxy) => void;
-  onPageSuccess: (pdf: PDFPageProxy) => void;
+  onDocumentSuccess?: (pdf: PDFDocumentProxy) => void;
+  onPageSuccess?: (pdf: PDFPageProxy) => void;
 }
 
 export interface ByblosPropsURL extends ByblosPropsBase {
