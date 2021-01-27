@@ -34,12 +34,12 @@ import {
 import React, {
   forwardRef,
   ReactNode,
+  useEffect,
   useRef,
 } from 'react';
 import pdfPromiseToES6 from './pdf-promise-to-es6';
 import suspend from './suspend';
 import useFetch from './use-fetch';
-import useIsomorphicEffect from './use-isomorphic-effect';
 
 export interface ByblosPropsBase {
   page?: number;
@@ -80,7 +80,7 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
 
   // Process PDF Data into PDF Document
   const documentResult = useFetch<PDFDocumentProxy>(async (wrap) => {
-    GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist/build/pdf.worker.min.js';
+    GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@2.5.207/build/pdf.worker.min.js';
 
     if (bufferResult.status === 'success') {
       const task = getDocument(bufferResult.data);
@@ -89,25 +89,28 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
     return suspend();
   }, [bufferResult]);
 
-  useIsomorphicEffect(() => {
-    if (documentResult.status === 'success' && props.onDocumentSuccess) {
-      props.onDocumentSuccess(documentResult.data);
+  const { onDocumentSuccess } = props;
+  useEffect(() => {
+    if (documentResult.status === 'success' && onDocumentSuccess) {
+      onDocumentSuccess(documentResult.data);
     }
-  }, [documentResult, props.onDocumentSuccess]);
+  }, [documentResult, onDocumentSuccess]);
 
   // Parse PDF Document to Page
+  const { page } = props;
   const pageResult = useFetch<PDFPageProxy>(async (wrap) => {
     if (documentResult.status === 'success') {
-      return wrap(pdfPromiseToES6(documentResult.data.getPage(props.page ?? 1)));
+      return wrap(pdfPromiseToES6(documentResult.data.getPage(page ?? 1)));
     }
     return suspend();
-  }, [documentResult, props.page]);
+  }, [documentResult, page]);
 
-  useIsomorphicEffect(() => {
-    if (pageResult.status === 'success' && props.onPageSuccess) {
-      props.onPageSuccess(pageResult.data);
+  const { onPageSuccess } = props;
+  useEffect(() => {
+    if (pageResult.status === 'success' && onPageSuccess) {
+      onPageSuccess(pageResult.data);
     }
-  }, [pageResult, props.onPageSuccess]);
+  }, [pageResult, onPageSuccess]);
 
   // Ref to canvas
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -115,38 +118,42 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
   const loading = bufferResult.status === 'pending'
     || documentResult.status === 'pending'
     || pageResult.status === 'pending';
+  const { onLoading } = props;
   // Handle loading event
-  useIsomorphicEffect(() => {
-    if (loading && props.onLoading) {
-      props.onLoading();
+  useEffect(() => {
+    if (loading && onLoading) {
+      onLoading();
     }
-  }, [props.onLoading, loading]);
+  }, [onLoading, loading]);
 
   // Handle success event
   const success = pageResult.status === 'success';
-  useIsomorphicEffect(() => {
-    if (loading && props.onSuccess) {
-      props.onSuccess();
+  const { onSuccess } = props;
+  useEffect(() => {
+    if (success && onSuccess) {
+      onSuccess();
     }
-  }, [props.onSuccess, success]);
+  }, [onSuccess, success]);
 
   // Handle error event
   const error = (bufferResult.status === 'failure' && bufferResult.data)
     || (documentResult.status === 'failure' && documentResult.data)
     || (pageResult.status === 'failure' && pageResult.data);
-  useIsomorphicEffect(() => {
-    if (error && props.onFailure) {
-      props.onFailure(error);
+  const { onFailure } = props;
+  useEffect(() => {
+    if (error && onFailure) {
+      onFailure(error);
     }
-  }, [props.onFailure, error]);
+  }, [onFailure, error]);
 
   // Run rendering process
-  useIsomorphicEffect(() => {
+  const { scale } = props;
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas && pageResult.status === 'success') {
-      const page = pageResult.data;
-      const viewport = page.getViewport({
-        scale: props.scale ?? 1,
+      const pageData = pageResult.data;
+      const viewport = pageData.getViewport({
+        scale: scale ?? 1,
       });
       const context = canvas.getContext('2d');
 
@@ -157,12 +164,12 @@ const Byblos = forwardRef<HTMLCanvasElement, ByblosProps>((props, ref) => {
       canvas.height = viewport.height;
       canvas.width = viewport.width;
 
-      page.render({
+      pageData.render({
         canvasContext: context,
         viewport,
       });
     }
-  }, [canvasRef.current, pageResult.status, pageResult.data, props.scale]);
+  }, [pageResult, scale]);
 
   if (loading) {
     return <>{ props.loadingFallback }</>;

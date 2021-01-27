@@ -25,8 +25,7 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { DependencyList, useState } from 'react';
-import useIsomorphicEffect from './use-isomorphic-effect';
+import { DependencyList, useEffect, useState } from 'react';
 
 export type PromiseWrapper = <T>(promise: Promise<T>) => Promise<T>;
 export type Fetch<T> = (wrapper: PromiseWrapper) => Promise<T>;
@@ -59,7 +58,7 @@ export default function useFetch<S, E = Error>(
     status: 'pending',
   });
 
-  useIsomorphicEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
     setResult((current) => {
