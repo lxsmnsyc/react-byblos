@@ -1,7 +1,12 @@
 {
-  "version": "0.5.1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "0.6.0",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -23,11 +28,6 @@
     "pridepack"
   ],
   "name": "react-byblos",
-  "module": "dist/react-byblos.esm.js",
-  "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist/react-byblos.esm.js"
-  },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
@@ -38,7 +38,7 @@
     "@types/react": "^17.0.3",
     "eslint": "^7.22.0",
     "eslint-config-lxsmnsyc": "^0.1.19",
-    "pridepack": "^0.7.2",
+    "pridepack": "^0.8.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-test-renderer": "^17.0.1",
